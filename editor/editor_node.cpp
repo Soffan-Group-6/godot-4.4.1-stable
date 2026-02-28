@@ -30,6 +30,8 @@
 
 #include "editor_node.h"
 
+#include <iostream>
+
 #include "core/config/project_settings.h"
 #include "core/extension/gdextension_manager.h"
 #include "core/input/input.h"
@@ -615,6 +617,7 @@ void EditorNode::_update_from_settings() {
 }
 
 void EditorNode::_gdextensions_reloaded() {
+	std::cout << "\033[31meditor_node.cpp, R620, _gdextensions_reloaded()\033[0m" << std::endl;
 	// In case the developer is inspecting an object that will be changed by the reload.
 	InspectorDock::get_inspector_singleton()->update_tree();
 
@@ -1670,6 +1673,7 @@ Error EditorNode::load_resource(const String &p_resource, bool p_ignore_broken_d
 	if (force_textfile_extensions.has(p_resource.get_extension())) {
 		const String resource_type = ResourceLoader::get_resource_type(p_resource);
 		if (resource_type != "Translation" && ResourceLoader::exists(p_resource, "")) {
+			std::cout << "\033[31meditor_node.cpp, R1676, load_resource() CALL LOAD\033[0m" << std::endl;
 			res = ResourceLoader::load(p_resource, "", ResourceFormatLoader::CACHE_MODE_REUSE, &err);
 		}
 		if (res.is_null()) {
@@ -1679,6 +1683,7 @@ Error EditorNode::load_resource(const String &p_resource, bool p_ignore_broken_d
 			}
 		}
 	} else if (ResourceLoader::exists(p_resource, "")) {
+		std::cout << "\033[31meditor_node.cpp, R1686, load_resource() CALL LOAD\033[0m" << std::endl;
 		res = ResourceLoader::load(p_resource, "", ResourceFormatLoader::CACHE_MODE_REUSE, &err);
 	} else if (textfile_extensions.has(p_resource.get_extension())) {
 		res = ScriptEditor::get_singleton()->open_file(p_resource);
@@ -2761,6 +2766,7 @@ void EditorNode::_dialog_action(String p_file) {
 
 			Ref<MeshLibrary> ml;
 			if (merge_with_existing_library && FileAccess::exists(p_file)) {
+				std::cout << "\033[31meditor_node.cpp, R2769, _dialog_action() CALL LOAD\033[0m" << std::endl;
 				ml = ResourceLoader::load(p_file, "MeshLibrary");
 
 				if (ml.is_null()) {
@@ -2780,6 +2786,7 @@ void EditorNode::_dialog_action(String p_file) {
 				show_accept(TTR("Error saving MeshLibrary!"), TTR("OK"));
 				return;
 			} else if (ResourceCache::has(p_file)) {
+				std::cout << "\033[31meditor_node.cpp, R2789, _dialog_action() CALL LOAD\033[0m" << std::endl;
 				// Make sure MeshLibrary is updated in the editor.
 				ResourceLoader::load(p_file)->reload_from_file();
 			}
@@ -2813,6 +2820,7 @@ void EditorNode::_dialog_action(String p_file) {
 
 			Ref<ConfigFile> config;
 			config.instantiate();
+			std::cout << "\033[31meditor_node.cpp, R2823, _dialog_action() LAYOUT_SAVE CALL CONFIG LOAD\033[0m" << std::endl;
 			Error err = config->load(EditorSettings::get_singleton()->get_editor_layouts_config());
 
 			if (err == ERR_FILE_CANT_OPEN || err == ERR_FILE_NOT_FOUND) {
@@ -2837,6 +2845,7 @@ void EditorNode::_dialog_action(String p_file) {
 		case LAYOUT_DELETE: {
 			Ref<ConfigFile> config;
 			config.instantiate();
+			std::cout << "\033[31meditor_node.cpp, R2848, _dialog_action() LAYOUT_DELETE CALL CONFIG LOAD\033[0m" << std::endl;
 			Error err = config->load(EditorSettings::get_singleton()->get_editor_layouts_config());
 
 			if (err != OK || !config->has_section(p_file)) {
@@ -4419,6 +4428,7 @@ void EditorNode::set_addon_plugin_enabled(const String &p_addon, bool p_enabled,
 		script_path = addon_path.get_base_dir().path_join(script_path);
 		// We should not use the cached version on startup to prevent a script reload
 		// if it is already loaded and potentially running from autoloads. See GH-100750.
+		std::cout << "\033[31meditor_node.cpp, R4431, set_addon_plugin_enabled() CALL LOAD\033[0m" << std::endl;
 		scr = ResourceLoader::load(script_path, "Script", EditorFileSystem::get_singleton()->doing_first_scan() ? ResourceFormatLoader::CACHE_MODE_REUSE : ResourceFormatLoader::CACHE_MODE_IGNORE);
 
 		if (scr.is_null()) {
@@ -4813,8 +4823,9 @@ Error EditorNode::load_scene(const String &p_scene, bool p_ignore_broken_deps, b
 	dependency_errors.clear();
 
 	Error err;
-	Ref<PackedScene> sdata = ResourceLoader::load(lpath, "", ResourceFormatLoader::CACHE_MODE_REPLACE, &err);
-
+	std::cout << "\033[31meditor_node.cpp, R4826, load_scene() CALL LOAD\033[0m" << std::endl;
+	Ref<PackedScene> sdata = ResourceLoader::load(lpath, "", ResourceFormatLoader::CACHE_MODE_REUSE, &err); // BEFORE CACHE_MODE_REPLACE
+	std::cout << "\033[31meditor_node.cpp, R4826, load_scene() LOAD EXITED\033[0m" << std::endl;
 	if (!p_ignore_broken_deps && !dependency_errors.is_empty()) {
 		current_menu_option = -1;
 		dependency_error->show(lpath, dependency_errors);
@@ -4849,6 +4860,7 @@ Error EditorNode::load_scene(const String &p_scene, bool p_ignore_broken_deps, b
 
 	if (ResourceCache::has(lpath)) {
 		// Used from somewhere else? No problem! Update state and replace sdata.
+		std::cout << "\033[31meditor_node.cpp, R4863, load_scene() ENTERS IF: ResourceCache::has(lpath)\033[0m" << std::endl;
 		Ref<PackedScene> ps = ResourceCache::get_ref(lpath);
 		if (ps.is_valid()) {
 			ps->replace_state(sdata->get_state());
@@ -4857,14 +4869,17 @@ Error EditorNode::load_scene(const String &p_scene, bool p_ignore_broken_deps, b
 		}
 
 	} else {
+		std::cout << "\033[31meditor_node.cpp, R4872, load_scene() ENTERS ELSE: ResourceCache::has(lpath)\033[0m" << std::endl;
 		sdata->set_path(lpath, true); // Take over path.
 	}
 
 	Node *new_scene = sdata->instantiate(p_set_inherited ? PackedScene::GEN_EDIT_STATE_MAIN_INHERITED : PackedScene::GEN_EDIT_STATE_MAIN);
 	if (!new_scene) {
+		std::cout << "\033[31meditor_node.cpp, R4878, load_scene() ENTERS IF: !new_scene\033[0m" << std::endl;
 		sdata.unref();
 		_dialog_display_load_error(lpath, ERR_FILE_CORRUPT);
 		if (prev != -1 && prev != idx) {
+			std::cout << "\033[31meditor_node.cpp, R4882, load_scene() ENTERS IF: prev != -1 && prev != idx\033[0m" << std::endl;
 			_set_current_scene(prev);
 			editor_data.remove_scene(idx);
 		}
@@ -5697,6 +5712,7 @@ Ref<Texture2D> EditorNode::_get_class_or_script_icon(const String &p_class, cons
 			if (ScriptServer::is_global_class(p_class)) {
 				base_type = ScriptServer::get_global_class_native_base(p_class);
 			} else {
+				std::cout << "\033[31meditor_node.cpp, R5711, _get_class_or_script_icon() CALL LOAD\033[0m" << std::endl;
 				Ref<Script> scr = ResourceLoader::load(p_script_path, "Script");
 				if (scr.is_valid()) {
 					base_type = scr->get_instance_base_type();
@@ -6191,6 +6207,7 @@ void EditorNode::_save_editor_layout() {
 	Ref<ConfigFile> config;
 	config.instantiate();
 	// Load and amend existing config if it exists.
+	std::cout << "\033[31meditor_node.cpp, R6206, _save_editor_layout() CONFIG CALL LOAD\033[0m" << std::endl;
 	config->load(EditorPaths::get_singleton()->get_project_settings_dir().path_join("editor_layout.cfg"));
 
 	editor_dock_manager->save_docks_to_config(config, "docks");
@@ -6448,6 +6465,7 @@ bool EditorNode::validate_custom_directory() {
 
 void EditorNode::run_editor_script(const Ref<Script> &p_script) {
 	Error err = p_script->reload(true); // Always hard reload the script before running.
+	std::cout << "\033[31meditor_node.cpp, R6451, run_editor_script()\033[0m" << std::endl;
 	if (err != OK || !p_script->is_valid()) {
 		EditorToaster::get_singleton()->popup_str(TTR("Cannot run the script because it contains errors, check the output log."), EditorToaster::SEVERITY_WARNING);
 		return;
@@ -7167,6 +7185,7 @@ void EditorNode::reload_instances_with_path_in_edited_scenes() {
 	for (KeyValue<int, SceneModificationsEntry> &scene_modifications_elem : scenes_modification_table) {
 		for (InstanceModificationsEntry instance_modifications : scene_modifications_elem.value.instance_list) {
 			if (!local_scene_cache.has(instance_modifications.instance_path)) {
+				std::cout << "\033[31meditor_node.cpp, R7184, reload_instances_with_path_in_edited_scenes() CALL LOAD\033[0m" << std::endl;
 				Ref<PackedScene> instance_scene_packed_scene = ResourceLoader::load(instance_modifications.instance_path, "", ResourceFormatLoader::CACHE_MODE_REPLACE, &err);
 
 				ERR_FAIL_COND(err != OK);
@@ -7252,6 +7271,7 @@ void EditorNode::reload_instances_with_path_in_edited_scenes() {
 						base_packed_scene = current_packed_scene;
 					}
 					if (!local_scene_cache.find(path)) {
+						std::cout << "\033[31meditor_node.cpp, R7270, reload_instances_with_path_in_edited_scenes() CALL LOAD\033[0m" << std::endl;
 						current_packed_scene = ResourceLoader::load(path, "", ResourceFormatLoader::CACHE_MODE_REPLACE, &err);
 						local_scene_cache[path] = current_packed_scene;
 					} else {

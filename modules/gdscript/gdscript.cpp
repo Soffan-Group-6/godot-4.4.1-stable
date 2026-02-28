@@ -30,6 +30,8 @@
 
 #include "gdscript.h"
 
+#include <iostream>
+
 #include "core/object/class_db.h"
 #include "gdscript_analyzer.h"
 #include "gdscript_cache.h"
@@ -2504,8 +2506,9 @@ void GDScriptLanguage::reload_scripts(const Array &p_scripts, bool p_soft_reload
 		Ref<GDScript> scr = E.key;
 		print_verbose("GDScript: Reloading: " + scr->get_path());
 		if (scr->is_built_in()) {
-			// TODO: It would be nice to do it more efficiently than loading the whole scene again.
+			// TODO: It would be nice to do it more efficiently than loading the whole scene again.			
 			Ref<PackedScene> scene = ResourceLoader::load(scr->get_path().get_slice("::", 0), "", ResourceFormatLoader::CACHE_MODE_IGNORE_DEEP);
+			std::cout << "\033[31mgdscript.cpp, R2510, LOAD CALLED IN: reload_scripts()\033[0m" << std::endl;
 			ERR_CONTINUE(scene.is_null());
 
 			Ref<SceneState> state = scene->get_state();
@@ -2908,6 +2911,7 @@ Ref<GDScript> GDScriptLanguage::get_script_by_fully_qualified_name(const String 
 
 Ref<Resource> ResourceFormatLoaderGDScript::load(const String &p_path, const String &p_original_path, Error *r_error, bool p_use_sub_threads, float *r_progress, CacheMode p_cache_mode) {
 	Error err;
+	std::cout << "\033[31mgdscript.cpp, R2914, LOAD CALLED\033[0m" << std::endl;
 	bool ignoring = p_cache_mode == CACHE_MODE_IGNORE || p_cache_mode == CACHE_MODE_IGNORE_DEEP;
 	Ref<GDScript> scr = GDScriptCache::get_full_script(p_original_path, err, "", ignoring);
 
@@ -2962,6 +2966,7 @@ void ResourceFormatLoaderGDScript::get_dependencies(const String &p_path, List<S
 
 void ResourceFormatLoaderGDScript::get_classes_used(const String &p_path, HashSet<StringName> *r_classes) {
 	Ref<GDScript> scr = ResourceLoader::load(p_path);
+	std::cout << "\033[31mgdscript.cpp, R2968, LOAD CALLED IN:get_classes_used()\033[0m" << std::endl;
 	if (scr.is_null()) {
 		return;
 	}

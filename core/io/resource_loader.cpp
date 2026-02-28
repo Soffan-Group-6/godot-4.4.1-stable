@@ -30,6 +30,8 @@
 
 #include "resource_loader.h"
 
+#include <iostream>
+
 #include "core/config/project_settings.h"
 #include "core/core_bind.h"
 #include "core/io/dir_access.h"
@@ -273,7 +275,7 @@ ResourceLoader::LoadToken::~LoadToken() {
 Ref<Resource> ResourceLoader::_load(const String &p_path, const String &p_original_path, const String &p_type_hint, ResourceFormatLoader::CacheMode p_cache_mode, Error *r_error, bool p_use_sub_threads, float *r_progress) {
 	const String &original_path = p_original_path.is_empty() ? p_path : p_original_path;
 	load_nesting++;
-
+	std::cout << "\033[31mresource_loader.cpp, R276, _load() _LOAD CALLED\033[0m" << std::endl;
 	print_verbose(vformat("Loading resource: %s", p_path));
 
 	// Try all loaders and pick the first match for the type hint
@@ -364,7 +366,9 @@ void ResourceLoader::_run_load_task(void *p_userdata) {
 	const String &remapped_path = _path_remap(load_task.local_path, &xl_remapped);
 
 	Error load_err = OK;
+	std::cout << "\033[31mresource_loader.cpp, R369, _run_load_task() _LOAD CALLED\033[0m" << std::endl;
 	Ref<Resource> res = _load(remapped_path, remapped_path != load_task.local_path ? load_task.local_path : String(), load_task.type_hint, load_task.cache_mode, &load_err, load_task.use_sub_threads, &load_task.progress);
+	std::cout << "\033[31mresource_loader.cpp, R369, _run_load_task() _LOAD EXITED\033[0m" << std::endl;
 	if (MessageQueue::get_singleton() != MessageQueue::get_main_singleton()) {
 		MessageQueue::get_singleton()->flush();
 	}
@@ -509,6 +513,7 @@ void ResourceLoader::_load_threaded_request_setup_user_token(LoadToken *p_token,
 }
 
 Ref<Resource> ResourceLoader::load(const String &p_path, const String &p_type_hint, ResourceFormatLoader::CacheMode p_cache_mode, Error *r_error) {
+	std::cout << "\033[31mresource_loader.cpp, R514, load() LOAD CALLED - PATH: \033[0m" << p_path.utf8().get_data() << std::endl;
 	if (r_error) {
 		*r_error = OK;
 	}
@@ -521,6 +526,7 @@ Ref<Resource> ResourceLoader::load(const String &p_path, const String &p_type_hi
 		// cyclic load detection and awaiting.
 		thread_mode = LOAD_THREAD_SPAWN_SINGLE;
 	}
+	std::cout << "\033[31mresource_loader.cpp, R529, load() LOAD_START CALLED: SENDING \033[0m" << thread_mode << std::endl;
 	Ref<LoadToken> load_token = _load_start(p_path, p_type_hint, thread_mode, p_cache_mode);
 	if (load_token.is_null()) {
 		if (r_error) {
@@ -529,14 +535,16 @@ Ref<Resource> ResourceLoader::load(const String &p_path, const String &p_type_hi
 		return Ref<Resource>();
 	}
 
+	std::cout << "\033[31mresource_loader.cpp, R539, load() _LOAD_COMPLETE CALLED\033[0m" << std::endl;
 	Ref<Resource> res = _load_complete(*load_token.ptr(), r_error);
+	
 	return res;
 }
 
 Ref<ResourceLoader::LoadToken> ResourceLoader::_load_start(const String &p_path, const String &p_type_hint, LoadThreadMode p_thread_mode, ResourceFormatLoader::CacheMode p_cache_mode, bool p_for_user) {
 	String local_path = _validate_local_path(p_path);
 	ERR_FAIL_COND_V(local_path.is_empty(), Ref<ResourceLoader::LoadToken>());
-
+	std::cout << "\033[31mresource_loader.cpp, R547, _load_start() PATH: \033[0m" << p_path.utf8().get_data() << std::endl;
 	bool ignoring_cache = p_cache_mode == ResourceFormatLoader::CACHE_MODE_IGNORE || p_cache_mode == ResourceFormatLoader::CACHE_MODE_IGNORE_DEEP;
 
 	Ref<LoadToken> load_token;
@@ -544,36 +552,45 @@ Ref<ResourceLoader::LoadToken> ResourceLoader::_load_start(const String &p_path,
 	ThreadLoadTask *load_task_ptr = nullptr;
 	{
 		MutexLock thread_load_lock(thread_load_mutex);
-
+		std::cout << "\033[31mtest1\033[0m" << std::endl;
 		if (p_for_user) {
+			std::cout << "\033[31mif1\033[0m" << std::endl;
 			LoadToken *existing_token = _load_threaded_request_reuse_user_token(p_path);
 			if (existing_token) {
 				return Ref<LoadToken>(existing_token);
 			}
 		}
 
+		std::cout << "\033[31mtest2\033[0m" << std::endl;
 		if (!ignoring_cache && thread_load_tasks.has(local_path)) {
+			std::cout << "\033[31mif2\033[0m" << p_path.utf8().get_data() << std::endl;
 			load_token = Ref<LoadToken>(thread_load_tasks[local_path].load_token);
 			if (load_token.is_valid()) {
+				std::cout << "\033[31mif2.1\033[0m" << std::endl;
 				if (p_for_user) {
+					std::cout << "\033[31mif2.1.1\033[0m" << std::endl;
 					// Load task exists, with no user tokens at the moment.
 					// Let's "attach" to it.
 					_load_threaded_request_setup_user_token(load_token.ptr(), p_path);
 				}
 				return load_token;
 			} else {
+				std::cout << "\033[31mielse2\033[0m" << p_path.utf8().get_data() << std::endl;
 				// The token is dying (reached 0 on another thread).
 				// Ensure it's killed now so the path can be safely reused right away.
 				thread_load_tasks[local_path].load_token->clear();
 			}
 		}
+		std::cout << "\033[31mtest3\033[0m" << std::endl;
 
 		load_token.instantiate();
 		load_token->local_path = local_path;
 		if (p_for_user) {
+			std::cout << "\033[31mif3\033[0m" << std::endl;
 			_load_threaded_request_setup_user_token(load_token.ptr(), p_path);
 		}
 
+		std::cout << "\033[31mtest4\033[0m" << std::endl;
 		//create load task
 		{
 			ThreadLoadTask load_task;
@@ -583,9 +600,12 @@ Ref<ResourceLoader::LoadToken> ResourceLoader::_load_start(const String &p_path,
 			load_task.type_hint = p_type_hint;
 			load_task.cache_mode = p_cache_mode;
 			load_task.use_sub_threads = p_thread_mode == LOAD_THREAD_DISTRIBUTE;
+			std::cout << "\033[31mtest5: p_cache_mode: \033[0m" << p_cache_mode << " CACHE_MODE_REUSE: " << ResourceFormatLoader::CACHE_MODE_REUSE << std::endl;
 			if (p_cache_mode == ResourceFormatLoader::CACHE_MODE_REUSE) {
+				std::cout << "\033[31mresource_loader.cpp, R592, _load_start() get_ref() CALLED\033[0m" << std::endl;
 				Ref<Resource> existing = ResourceCache::get_ref(local_path);
 				if (existing.is_valid()) {
+					std::cout << "\033[31mresource_loader.cpp, R595, _load_start() ENTER IF: existing.is_valid()\033[0m" << std::endl;
 					//referencing is fine
 					load_task.resource = existing;
 					load_task.status = THREAD_LOAD_LOADED;
@@ -783,6 +803,7 @@ Ref<Resource> ResourceLoader::load_threaded_get(const String &p_path, Error *r_e
 }
 
 Ref<Resource> ResourceLoader::_load_complete(LoadToken &p_load_token, Error *r_error) {
+	std::cout << "\033[31mresource_loader.cpp, R796, _load_complete() ENTERED\033[0m" << std::endl;
 	MutexLock thread_load_lock(thread_load_mutex);
 	return _load_complete_inner(p_load_token, r_error, thread_load_lock);
 }
@@ -857,6 +878,7 @@ Ref<Resource> ResourceLoader::_load_complete_inner(LoadToken &p_load_token, Erro
 					// cycle, with as much recursion into this process as needed.
 					// When the stack is eventually unrolled, the original load will have been notified to go on.
 					load_task.load_token->reference();
+					std::cout << "\033[31mresource_loader.cpp, R881, _load_complete_inner() CALL _run_load_task\033[0m" << std::endl;
 					_run_load_task(&load_task);
 				}
 

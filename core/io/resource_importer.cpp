@@ -30,6 +30,8 @@
 
 #include "resource_importer.h"
 
+#include <iostream>
+
 #include "core/config/project_settings.h"
 #include "core/io/config_file.h"
 #include "core/io/image.h"
@@ -164,8 +166,10 @@ Ref<Resource> ResourceFormatImporter::load(const String &p_path, const String &p
 	if (ResourceImporter::load_on_startup != nullptr) {
 		return ResourceImporter::load_on_startup(this, p_path, r_error, p_use_sub_threads, r_progress, p_cache_mode);
 	}
+	std::cout << "\033[31mresource_importer.cpp, R167, load() LOAD CALLED (TOOLS_ENABLED) \033[0m" << std::endl;
 #endif
 
+	std::cout << "\033[31mresource_importer.cpp, R167, load() LOAD CALLED\033[0m" << std::endl;
 	return load_internal(p_path, r_error, p_use_sub_threads, r_progress, p_cache_mode, false);
 }
 
@@ -187,8 +191,9 @@ Ref<Resource> ResourceFormatImporter::load_internal(const String &p_path, Error 
 			return Ref<Resource>();
 		}
 	}
-
+	std::cout << "\033[31mresource_importer.cpp, R192, load_internal() _LOAD CALLED\033[0m" << std::endl;
 	Ref<Resource> res = ResourceLoader::_load(pat.path, p_path, pat.type, p_cache_mode, r_error, p_use_sub_threads, r_progress);
+	std::cout << "\033[31mresource_importer.cpp, R192, load_internal() _LOAD EXITED\033[0m" << std::endl;
 
 #ifdef TOOLS_ENABLED
 	if (res.is_valid()) {

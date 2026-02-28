@@ -30,6 +30,8 @@
 
 #include "resource.h"
 
+#include <iostream>
+
 #include "core/io/resource_loader.h"
 #include "core/math/math_funcs.h"
 #include "core/math/random_pcg.h"
@@ -855,6 +857,8 @@ Ref<Resource> ResourceCache::get_ref(const String &p_path) {
 			res = nullptr;
 		}
 	}
+
+	std::cout << "\033[31mresource.cpp, R859, get_ref() Ref<Resource> OBJECT CREATED AND RETURNED\033[0m" << std::endl;
 
 	return ref;
 }
