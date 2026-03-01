@@ -2640,6 +2640,14 @@ bool CSharpScript::get_property_default_value(const StringName &p_property, Vari
 	HashMap<StringName, Variant>::ConstIterator E = exported_members_defval_cache.find(p_property);
 	if (E) {
 		r_value = E->value;
+		// Duplicate container types so callers don't share the same cached instance.
+		// Without this, all resources using this script would share the same
+		// Dictionary/Array object in memory (GH-107588).
+		if (r_value.get_type() == Variant::DICTIONARY) {
+			r_value = Dictionary(r_value).duplicate();
+		} else if (r_value.get_type() == Variant::ARRAY) {
+			r_value = Array(r_value).duplicate();
+		}
 		return true;
 	}
 
