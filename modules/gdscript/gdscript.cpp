@@ -2964,6 +2964,7 @@ void ResourceFormatLoaderGDScript::get_dependencies(const String &p_path, List<S
 	}
 }
 
+// PRINTS
 void ResourceFormatLoaderGDScript::get_classes_used(const String &p_path, HashSet<StringName> *r_classes) {
 	Ref<GDScript> scr = ResourceLoader::load(p_path);
 	std::cout << "\033[31mgdscript.cpp, R2968, LOAD CALLED IN:get_classes_used()\033[0m" << std::endl;

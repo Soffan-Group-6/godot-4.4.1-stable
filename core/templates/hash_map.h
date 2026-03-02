@@ -107,10 +107,12 @@ private:
 		return distance_idx >= p_capacity ? distance_idx - p_capacity : distance_idx;
 	}
 
+	// POINT OF INTEREST
 	bool _lookup_idx(const TKey &p_key, uint32_t &r_idx) const {
 		return _elements != nullptr && _size > 0 && _lookup_idx_unchecked(p_key, _hash(p_key), r_idx);
 	}
 
+	// POINT OF INTEREST
 	/// Note: Assumes that _elements != nullptr
 	bool _lookup_idx_unchecked(const TKey &p_key, uint32_t p_hash, uint32_t &r_idx) const {
 		const uint32_t capacity = hash_table_size_primes[_capacity_idx];
@@ -307,6 +309,7 @@ public:
 		return nullptr;
 	}
 
+	// POINT OF INTEREST
 	TValue *getptr(const TKey &p_key) {
 		uint32_t idx = 0;
 		bool exists = _lookup_idx(p_key, idx);

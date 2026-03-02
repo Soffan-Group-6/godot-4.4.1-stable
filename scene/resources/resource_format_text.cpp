@@ -30,6 +30,8 @@
 
 #include "resource_format_text.h"
 
+#include <iostream>
+
 #include "core/config/project_settings.h"
 #include "core/io/dir_access.h"
 #include "core/io/missing_resource.h"
@@ -449,6 +451,7 @@ void ResourceLoaderText::_count_resources() {
 }
 
 Error ResourceLoaderText::load() {
+	std::cout << "resource_format_text.cpp, R424, load ENTERED ERROR" << std::endl;
 	if (error != OK) {
 		return error;
 	}
@@ -516,6 +519,7 @@ Error ResourceLoaderText::load() {
 
 		ext_resources[id].path = path;
 		ext_resources[id].type = type;
+		std::cout << "resource_format_text.cpp, R424, Error load()" << "CALLING _load_start()" << std::endl;
 		ext_resources[id].load_token = ResourceLoader::_load_start(path, type, use_sub_threads ? ResourceLoader::LOAD_THREAD_DISTRIBUTE : ResourceLoader::LOAD_THREAD_FROM_CURRENT, cache_mode_for_external);
 		if (ext_resources[id].load_token.is_null()) {
 			if (ResourceLoader::get_abort_on_missing_resources()) {
@@ -574,6 +578,7 @@ Error ResourceLoaderText::load() {
 
 		if (cache_mode == ResourceFormatLoader::CACHE_MODE_REPLACE && ResourceCache::has(path)) {
 			//reuse existing
+			std::cout << "resource_format_text.cpp, R581, Error load() " << "ENTERED IF: cache_mode == ResourceFormatLoader::CACHE_MODE_REPLACE && ResourceCache::has(path)" << std::endl;
 			Ref<Resource> cache = ResourceCache::get_ref(path);
 			if (cache.is_valid() && cache->get_class() == type) {
 				res = cache;
@@ -585,6 +590,7 @@ Error ResourceLoaderText::load() {
 		MissingResource *missing_resource = nullptr;
 
 		if (res.is_null()) { //not reuse
+			std::cout << "resource_format_text.cpp, R593, Error load() " << "ENTERED IF: (res.is_null())" << std::endl;
 			Ref<Resource> cache = ResourceCache::get_ref(path);
 			if (cache_mode != ResourceFormatLoader::CACHE_MODE_IGNORE && cache.is_valid()) { //only if it doesn't exist
 				//cached, do not assign
@@ -678,6 +684,7 @@ Error ResourceLoaderText::load() {
 					}
 
 					if (value.get_type() == Variant::DICTIONARY) {
+						std::cout << "resource_format_text.cpp, R687, ENTERED IF: DICTIONARY" << res.get_class_static << std::endl;
 						Dictionary set_dict = value;
 						bool is_get_valid = false;
 						Variant get_value = res->get(assign, &is_get_valid);
@@ -731,8 +738,10 @@ Error ResourceLoaderText::load() {
 
 		resource = ResourceLoader::get_resource_ref_override(local_path);
 		if (resource.is_null()) {
+			std::cout << "resource_format_text.cpp, R740, Error load() " << "ENTERED IF: resource.is_null()" << std::endl;
 			Ref<Resource> cache = ResourceCache::get_ref(local_path);
 			if (cache_mode == ResourceFormatLoader::CACHE_MODE_REPLACE && cache.is_valid() && cache->get_class() == res_type) {
+				std::cout << "resource_format_text.cpp, R752, Error load() " << "ENTERED IF: CHACHE_MODE_REPLACE" << std::endl;
 				cache->reset_state();
 				resource = cache;
 			}
@@ -741,6 +750,7 @@ Error ResourceLoaderText::load() {
 				Object *obj = ClassDB::instantiate(res_type);
 				if (!obj) {
 					if (ResourceLoader::is_creating_missing_resources_if_class_unavailable_enabled()) {
+						std::cout << "resource_format_text.cpp, R752, Error load() " << "ENTERED IF: is_creating_missing_resources_if_class_unavailable_enabled" << std::endl;
 						missing_resource = memnew(MissingResource);
 						missing_resource->set_original_class(res_type);
 						missing_resource->set_recording_properties(true);
@@ -755,6 +765,7 @@ Error ResourceLoaderText::load() {
 
 				Resource *r = Object::cast_to<Resource>(obj);
 				if (!r) {
+					std::cout << "resource_format_text.cpp, R768, Error load() " << "ENTERED IF: !r" << std::endl;
 					error_text = vformat("Can't create sub resource of type '%s' as it's not a resource type", res_type);
 					_printerr();
 					error = ERR_FILE_CORRUPT;
@@ -781,8 +792,10 @@ Error ResourceLoaderText::load() {
 				// EOF, Done parsing.
 				error = OK;
 				if (cache_mode != ResourceFormatLoader::CACHE_MODE_IGNORE) {
-					if (!ResourceCache::has(res_path)) {
+					std::cout << "resource_format_text.cpp, R795, Error load() " << "ENTERED IF: CACHE_MODE_IGNORE" << std::endl;
+					if (!ResourceCache::has(res_path)) { // POINT OF INTEREST
 						resource->set_path(res_path);
+						std::cout << "resource_format_text.cpp, R798, Error load() " << "ENTERED IF: !has()" << std::endl;
 					}
 					resource->set_as_translation_remapped(translation_remapped);
 				} else {
@@ -793,12 +806,13 @@ Error ResourceLoaderText::load() {
 
 			if (!assign.is_empty()) {
 				bool set_valid = true;
+				std::cout << "resource_format_text.cpp, R808, Error load() " << "ENTERED IF: !assign.is_empty" << std::endl;
 
 				if (value.get_type() == Variant::OBJECT && missing_resource == nullptr && ResourceLoader::is_creating_missing_resources_if_class_unavailable_enabled()) {
 					// If the property being set is a missing resource (and the parent is not),
 					// then setting it will most likely not work.
 					// Instead, save it as metadata.
-
+					std::cout << "resource_format_text.cpp, R809, Error load() " << "ENTERED IF: missing_resource" << std::endl;
 					Ref<MissingResource> mr = value;
 					if (mr.is_valid()) {
 						missing_resource_properties[assign] = mr;
@@ -807,6 +821,7 @@ Error ResourceLoaderText::load() {
 				}
 
 				if (value.get_type() == Variant::ARRAY) {
+					std::cout << "resource_format_text.cpp, R822, Error load() " << "ENTERED IF: ARRAY" << std::endl;
 					Array set_array = value;
 					bool is_get_valid = false;
 					Variant get_value = resource->get(assign, &is_get_valid);
@@ -819,6 +834,7 @@ Error ResourceLoaderText::load() {
 				}
 
 				if (value.get_type() == Variant::DICTIONARY) {
+					std::cout << "resource_format_text.cpp, R830, Error load() " << "ENTERED IF: DICTIONARY" << std::endl;
 					Dictionary set_dict = value;
 					bool is_get_valid = false;
 					Variant get_value = resource->get(assign, &is_get_valid);
@@ -832,6 +848,7 @@ Error ResourceLoaderText::load() {
 				}
 
 				if (set_valid) {
+					std::cout << "resource_format_text.cpp, R848, Error load() " << "ENTERED IF: set_valid" << std::endl;
 					resource->set(assign, value);
 				}
 				//it's assignment
@@ -852,12 +869,16 @@ Error ResourceLoaderText::load() {
 		}
 
 		if (missing_resource) {
+			std::cout << "resource_format_text.cpp, R869, Error load() " << "ENTERED IF: missing_resource" << std::endl;
 			missing_resource->set_recording_properties(false);
 		}
 
 		if (!missing_resource_properties.is_empty()) {
+			std::cout << "resource_format_text.cpp, R875, Error load() " << "ENTERED IF: !missing_resource" << std::endl;
 			resource->set_meta(META_MISSING_RESOURCES, missing_resource_properties);
 		}
+
+		std::cout << "resource_format_text.cpp, R877, Error load() " << "resource_current: " << resource_current  << std::endl;
 
 		error = OK;
 
@@ -867,6 +888,7 @@ Error ResourceLoaderText::load() {
 	//for scene files
 
 	if (next_tag.name == "node") {
+		std::cout << "resource_format_text.cpp, R887, Error load() " << "ENTERED IF: node" << std::endl;
 		if (!is_scene) {
 			error_text = "Unexpected 'node' tag in a resource file";
 			_printerr();
@@ -877,6 +899,7 @@ Error ResourceLoaderText::load() {
 		Ref<PackedScene> packed_scene = _parse_node_tag(rp);
 
 		if (packed_scene.is_null()) {
+			std::cout << "resource_format_text.cpp, R895, Error load() " << "ENTERED IF: packed_scene.is_null()" << std::endl;
 			return error;
 		}
 
@@ -884,6 +907,7 @@ Error ResourceLoaderText::load() {
 		//get it here
 		resource = packed_scene;
 		if (cache_mode != ResourceFormatLoader::CACHE_MODE_IGNORE) {
+			std::cout << "resource_format_text.cpp, R903, Error load() " << "ENTERED IF: CACHE_MODE_IGNORE" << std::endl;
 			if (!ResourceCache::has(res_path)) {
 				packed_scene->set_path(res_path);
 			}
@@ -895,11 +919,13 @@ Error ResourceLoaderText::load() {
 		resource_current++;
 
 		if (progress && resources_total > 0) {
+			std::cout << "resource_format_text.cpp, R915, Error load() " << "ENTERED IF: progress && resources_total > 0; resource_current = " << resource_current << std::endl;
 			*progress = resource_current / float(resources_total);
 		}
 
 		return error;
 	} else {
+		std::cout << "resource_format_text.cpp, R924, Error load() " << "ENTERED ELSE" << std::endl;
 		error_text = vformat("Unknown tag '%s' in file", next_tag.name);
 		_printerr();
 		error = ERR_FILE_CORRUPT;
@@ -1419,6 +1445,7 @@ ResourceUID::ID ResourceLoaderText::get_uid(Ref<FileAccess> p_f) {
 /////////////////////
 
 Ref<Resource> ResourceFormatLoaderText::load(const String &p_path, const String &p_original_path, Error *r_error, bool p_use_sub_threads, float *r_progress, CacheMode p_cache_mode) {
+	std::cout << "resource_format_text.cpp, R1424, load ENTERED" << std::endl;
 	if (r_error) {
 		*r_error = ERR_CANT_OPEN;
 	}

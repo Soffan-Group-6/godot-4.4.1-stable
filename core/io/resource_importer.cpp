@@ -158,24 +158,26 @@ Error ResourceFormatImporter::_get_path_and_type(const String &p_path, PathAndTy
 }
 
 Ref<Resource> ResourceFormatImporter::load(const String &p_path, const String &p_original_path, Error *r_error, bool p_use_sub_threads, float *r_progress, CacheMode p_cache_mode) {
+	std::cout << "\033[31mresource_importer.cpp, R161, ResourceFormatImporter::load ENTERED\033[0m" << std::endl;
 #ifdef TOOLS_ENABLED
 	// When loading a resource on startup, we use the load_on_startup callback,
 	// which executes the loading in the EditorFileSystem. It can reimport
 	// the resource and retry the load, allowing the resource to be loaded
 	// even if it is not yet imported.
 	if (ResourceImporter::load_on_startup != nullptr) {
+		std::cout << "\033[31mTEEEEST!!!!!!!!!! \033[0m" << std::endl;
 		return ResourceImporter::load_on_startup(this, p_path, r_error, p_use_sub_threads, r_progress, p_cache_mode);
 	}
-	std::cout << "\033[31mresource_importer.cpp, R167, load() LOAD CALLED (TOOLS_ENABLED) \033[0m" << std::endl;
 #endif
 
-	std::cout << "\033[31mresource_importer.cpp, R167, load() LOAD CALLED\033[0m" << std::endl;
+	std::cout << "\033[31mresource_importer.cpp, R173, load_internal() CALLED\033[0m" << std::endl;
 	return load_internal(p_path, r_error, p_use_sub_threads, r_progress, p_cache_mode, false);
 }
 
 Ref<Resource> ResourceFormatImporter::load_internal(const String &p_path, Error *r_error, bool p_use_sub_threads, float *r_progress, CacheMode p_cache_mode, bool p_silence_errors) {
 	PathAndType pat;
 	Error err = _get_path_and_type(p_path, pat, true);
+	std::cout << "\033[31mresource_importer.cpp, R173, load_internal() ENTERED\033[0m" << std::endl;
 
 	if (err != OK) {
 		if (r_error) {

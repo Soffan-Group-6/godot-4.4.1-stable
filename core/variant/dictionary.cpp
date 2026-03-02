@@ -30,6 +30,8 @@
 
 #include "dictionary.h"
 
+#include <iostream>
+
 STATIC_ASSERT_INCOMPLETE_TYPE(class, Array);
 STATIC_ASSERT_INCOMPLETE_TYPE(class, Object);
 STATIC_ASSERT_INCOMPLETE_TYPE(class, String);
@@ -71,7 +73,9 @@ LocalVector<Variant> Dictionary::get_key_list() const {
 	return keys;
 }
 
+// PRINTS
 Variant Dictionary::get_key_at_index(int p_index) const {
+	std::cout << "\033[31mdictionary.cpp, R76:\033[0m" << "get_key_at_index() ENTERED" << std::endl;
 	int index = 0;
 	for (const KeyValue<Variant, Variant> &E : _p->variant_map) {
 		if (index == p_index) {

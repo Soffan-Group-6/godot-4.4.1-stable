@@ -377,7 +377,9 @@ void EditorNode::_update_title() {
 	}
 }
 
+// PRINTS
 void EditorNode::_update_unsaved_cache() {
+	std::cout << "\033[31meditor_node.cpp, R381:\033[0m" << "_update_unsaved_cache() ENTERED" << std::endl;
 	bool is_unsaved = EditorUndoRedoManager::get_singleton()->is_history_unsaved(EditorUndoRedoManager::GLOBAL_HISTORY) ||
 			EditorUndoRedoManager::get_singleton()->is_history_unsaved(editor_data.get_current_edited_scene_history_id());
 
@@ -387,7 +389,9 @@ void EditorNode::_update_unsaved_cache() {
 	}
 }
 
+// PRINTS
 void EditorNode::input(const Ref<InputEvent> &p_event) {
+	std::cout << "\033[31meditor_node.cpp, R391:\033[0m" << "input() ENTERED" << std::endl;
 	// EditorNode::get_singleton()->set_process_input is set to true in ProgressDialog
 	// only when the progress dialog is visible.
 	// We need to discard all key events to disable all shortcuts while the progress
@@ -400,7 +404,9 @@ void EditorNode::input(const Ref<InputEvent> &p_event) {
 	}
 }
 
+// PRINTS
 void EditorNode::shortcut_input(const Ref<InputEvent> &p_event) {
+	std::cout << "\033[31meditor_node.cpp, R404:\033[0m" << "shortcut_input() ENTERED" << std::endl;
 	ERR_FAIL_COND(p_event.is_null());
 
 	Ref<InputEventKey> k = p_event;
@@ -616,6 +622,7 @@ void EditorNode::_update_from_settings() {
 #endif // DEBUG_ENABLED
 }
 
+// PRINTS
 void EditorNode::_gdextensions_reloaded() {
 	std::cout << "\033[31meditor_node.cpp, R620, _gdextensions_reloaded()\033[0m" << std::endl;
 	// In case the developer is inspecting an object that will be changed by the reload.
@@ -1219,7 +1226,9 @@ void EditorNode::_execute_upgrades() {
 	}
 }
 
+// PRINTS
 void EditorNode::init_plugins() {
+	std::cout << "\033[31meditor_node.cpp, R1223:\033[0m" << "init_plugins() ENTERED" << std::endl;
 	_initializing_plugins = true;
 	Vector<String> addons;
 	if (ProjectSettings::get_singleton()->has_setting("editor_plugins/enabled")) {
@@ -1277,7 +1286,9 @@ void EditorNode::_plugin_over_self_own(EditorPlugin *p_plugin) {
 	active_plugins[p_plugin->get_instance_id()].insert(p_plugin);
 }
 
+// PRINTS
 void EditorNode::_resources_changed(const Vector<String> &p_resources) {
+	std::cout << "\033[31meditor_node.cpp, R1281:\033[0m" << "_resources_changed() ENTERED" << std::endl;
 	List<Ref<Resource>> changed;
 
 	int rc = p_resources.size();
@@ -1664,7 +1675,9 @@ void EditorNode::_open_command_palette() {
 	command_palette->open_popup();
 }
 
+// PRINTS
 Error EditorNode::load_resource(const String &p_resource, bool p_ignore_broken_deps) {
+	std::cout << "\033[31meditor_node.cpp, R1680:\033[0m" << "load_resource() ENTERED" << std::endl;
 	dependency_errors.clear();
 
 	Error err;
@@ -1673,17 +1686,19 @@ Error EditorNode::load_resource(const String &p_resource, bool p_ignore_broken_d
 	if (force_textfile_extensions.has(p_resource.get_extension())) {
 		const String resource_type = ResourceLoader::get_resource_type(p_resource);
 		if (resource_type != "Translation" && ResourceLoader::exists(p_resource, "")) {
-			std::cout << "\033[31meditor_node.cpp, R1676, load_resource() CALL LOAD\033[0m" << std::endl;
+			std::cout << "\033[31meditor_node.cpp, R1689, load_resource() CALL LOAD\033[0m" << std::endl;
 			res = ResourceLoader::load(p_resource, "", ResourceFormatLoader::CACHE_MODE_REUSE, &err);
 		}
 		if (res.is_null()) {
+			std::cout << "\033[31meditor_node.cpp, R1689, load_resource() \033[0m" << "ENTER IF: res.is_null()" << std::endl;
 			res = ResourceCache::get_ref(p_resource);
 			if (res.is_null() || !res->is_class("TextFile")) {
+				std::cout << "\033[31meditor_node.cpp, R1696, load_resource() \033[0m" << "ENTER IF: res not TextFile()" << std::endl;
 				res = ScriptEditor::get_singleton()->open_file(p_resource);
 			}
 		}
 	} else if (ResourceLoader::exists(p_resource, "")) {
-		std::cout << "\033[31meditor_node.cpp, R1686, load_resource() CALL LOAD\033[0m" << std::endl;
+		std::cout << "\033[31meditor_node.cpp, R1699, load_resource() CALL LOAD\033[0m" << std::endl;
 		res = ResourceLoader::load(p_resource, "", ResourceFormatLoader::CACHE_MODE_REUSE, &err);
 	} else if (textfile_extensions.has(p_resource.get_extension())) {
 		res = ScriptEditor::get_singleton()->open_file(p_resource);
@@ -1704,7 +1719,9 @@ Error EditorNode::load_resource(const String &p_resource, bool p_ignore_broken_d
 	return OK;
 }
 
+// PRINTS
 Error EditorNode::load_scene_or_resource(const String &p_path, bool p_ignore_broken_deps, bool p_change_scene_tab_if_already_open) {
+	std::cout << "\033[31meditor_node.cpp, R1708:\033[0m" << "load_scene_or_resource() ENTERED" << std::endl;
 	if (ClassDB::is_parent_class(ResourceLoader::get_resource_type(p_path), "PackedScene")) {
 		if (!p_change_scene_tab_if_already_open && EditorNode::get_singleton()->is_scene_open(p_path)) {
 			return OK;
@@ -1714,7 +1731,9 @@ Error EditorNode::load_scene_or_resource(const String &p_path, bool p_ignore_bro
 	return EditorNode::get_singleton()->load_resource(p_path, p_ignore_broken_deps);
 }
 
+// PRINTS
 void EditorNode::edit_node(Node *p_node) {
+	std::cout << "\033[31meditor_node.cpp, R1718:\033[0m" << "edit_node() ENTERED" << std::endl;
 	push_item(p_node);
 }
 
@@ -1887,7 +1906,9 @@ bool EditorNode::is_resource_internal_to_scene(Ref<Resource> p_resource) {
 	return inside_scene || p_resource->get_path().is_empty();
 }
 
+// PRINTS
 void EditorNode::gather_resources(const Variant &p_variant, List<Ref<Resource>> &r_list, bool p_subresources, bool p_allow_external) {
+	std::cout << "\033[31meditor_node.cpp, R1892:\033[0m" << "gather_resources() ENTERED" << std::endl;
 	Variant::Type type = p_variant.get_type();
 	if (type == Variant::OBJECT && p_variant.get_validated_object() == nullptr) {
 		return;
@@ -2003,12 +2024,16 @@ int EditorNode::get_resource_count(Ref<Resource> p_res) {
 	return L ? L->size() : 0;
 }
 
+// PRINTS
 List<Node *> EditorNode::get_resource_node_list(Ref<Resource> p_res) {
+	std::cout << "\033[31meditor_node.cpp, R2007:\033[0m" << "get_resource_node_list() ENTERED" << std::endl;
 	List<Node *> *L = resource_count.getptr(p_res);
 	return L == nullptr ? List<Node *>() : List<Node *>(*L);
 }
 
+// PRINTS
 void EditorNode::update_node_reference(const Variant &p_value, Node *p_node, bool p_remove) {
+	std::cout << "\033[31meditor_node.cpp, R2012:\033[0m" << "update_node_reference() ENTERED" << std::endl;
 	List<Ref<Resource>> list;
 	Ref<Resource> res = p_value;
 	gather_resources(p_value, list, true); //Gather all Resources and their SubResources to remove p_node from their lists.
@@ -2031,7 +2056,9 @@ void EditorNode::update_node_reference(const Variant &p_value, Node *p_node, boo
 	emit_signal(SNAME("resource_counter_changed"));
 }
 
+// PRINTS
 void EditorNode::clear_node_reference(Ref<Resource> p_res) {
+	std::cout << "\033[31meditor_node.cpp, R2035:\033[0m" << "clear_node_reference() ENTERED" << std::endl;
 	if (is_resource_internal_to_scene(p_res)) {
 		return;
 	}
@@ -2094,7 +2121,9 @@ void EditorNode::_dialog_display_load_error(String p_file, Error p_error) {
 	}
 }
 
+// PRINTS
 void EditorNode::_load_editor_plugin_states_from_config(const Ref<ConfigFile> &p_config_file) {
+	std::cout << "\033[31meditor_node.cpp, R2099:\033[0m" << "_load_editor_plugin_states_from_config() ENTERED" << std::endl;
 	Node *scene = editor_data.get_edited_scene_root();
 
 	if (!scene) {
@@ -2675,7 +2704,9 @@ bool EditorNode::is_scene_unsaved(int p_idx) {
 	return false;
 }
 
+// PRINTS
 void EditorNode::_dialog_action(String p_file) {
+	std::cout << "\033[31meditor_node.cpp, R2679:\033[0m" << "_dialog_action() ENTERED" << std::endl;
 	switch (current_menu_option) {
 		case SCENE_NEW_INHERITED_SCENE: {
 			Node *scene = editor_data.get_edited_scene_root();
@@ -2900,7 +2931,10 @@ bool EditorNode::_is_class_editor_disabled_by_feature_profile(const StringName &
 	return false;
 }
 
+// PRINTS
 void EditorNode::edit_item(Object *p_object, Object *p_editing_owner) {
+	std::cout << "\033[31meditor_node.cpp, R2904:\033[0m" << "edit_item() ENTERED" << std::endl;
+
 	ERR_FAIL_NULL(p_editing_owner);
 
 	// Editing for this type of object may be disabled by user's feature profile.
@@ -2998,14 +3032,18 @@ void EditorNode::edit_item(Object *p_object, Object *p_editing_owner) {
 	}
 }
 
+// PRINTS
 void EditorNode::push_node_item(Node *p_node) {
+	std::cout << "\033[31meditor_node.cpp, R3003:\033[0m" << "push_node_item() ENTERED" << std::endl;
 	if (p_node || !InspectorDock::get_inspector_singleton()->get_edited_object() || Object::cast_to<Node>(InspectorDock::get_inspector_singleton()->get_edited_object()) || Object::cast_to<MultiNodeEdit>(InspectorDock::get_inspector_singleton()->get_edited_object())) {
 		// Don't push null if the currently edited object is not a Node.
 		push_item(p_node);
 	}
 }
 
+// PRINTS
 void EditorNode::push_item(Object *p_object, const String &p_property, bool p_inspector_only) {
+	std::cout << "\033[31meditor_node.cpp, R3029:\033[0m" << "push_item() ENTERED" << std::endl;
 	if (!p_object) {
 		InspectorDock::get_inspector_singleton()->edit(nullptr);
 		SignalsDock::get_singleton()->set_object(nullptr);
@@ -3025,7 +3063,9 @@ void EditorNode::edit_previous_item() {
 	}
 }
 
+// PRINTS
 void EditorNode::push_item_no_inspector(Object *p_object) {
+	std::cout << "\033[31meditor_node.cpp, R3029:\033[0m" << "push_item_no_inspector() ENTERED" << std::endl;
 	_add_to_history(p_object, "", false);
 	_edit_current(false, true);
 }
@@ -3083,7 +3123,9 @@ void EditorNode::hide_unused_editors(const Object *p_editing_owner) {
 	}
 }
 
+// PRINTS
 void EditorNode::_add_to_history(const Object *p_object, const String &p_property, bool p_inspector_only) {
+	std::cout << "\033[31meditor_node.cpp, R3087, _add_to_history() ENTERED\033[0m" << std::endl;
 	ObjectID id = p_object->get_instance_id();
 	ObjectID history_id = editor_history.get_current();
 	if (id != history_id) {
@@ -3102,7 +3144,9 @@ void EditorNode::_add_to_history(const Object *p_object, const String &p_propert
 	}
 }
 
+// PRINTS
 void EditorNode::_edit_current(bool p_skip_foreign, bool p_skip_inspector_update) {
+	std::cout << "\033[31meditor_node.cpp, R3106, _edit_current() ENTERED\033[0m" << std::endl;
 	ObjectID current_id = editor_history.get_current();
 	Object *current_obj = current_id.is_valid() ? ObjectDB::get_instance(current_id) : nullptr;
 
@@ -3361,6 +3405,7 @@ static String _get_unsaved_scene_dialog_text(String p_scene_filename, uint64_t p
 	return unsaved_message;
 }
 
+// PRINTS
 void EditorNode::_menu_option_confirm(int p_option, bool p_confirmed) {
 	if (!p_confirmed) { // FIXME: this may be a hack.
 		current_menu_option = (MenuOptions)p_option;
@@ -3373,6 +3418,7 @@ void EditorNode::_menu_option_confirm(int p_option, bool p_confirmed) {
 		} break;
 		case SCENE_NEW_INHERITED_SCENE:
 		case SCENE_OPEN_SCENE: {
+			std::cout << "\033[31meditor_node.cpp, R4262, _menu_option_confirm() CASE SCENE_OPEN_SCENE ENTERED\033[0m" << std::endl;
 			file->set_file_mode(EditorFileDialog::FILE_MODE_OPEN_FILE);
 			List<String> extensions;
 			ResourceLoader::get_recognized_extensions_for_type("PackedScene", &extensions);
@@ -4211,6 +4257,7 @@ void EditorNode::_palette_quick_open_dialog() {
 	quick_open_color_palette->set_title(TTRC("Quick Open Color Palette..."));
 }
 
+// PRINTS
 void EditorNode::replace_resources_in_object(Object *p_object, const Vector<Ref<Resource>> &p_source_resources, const Vector<Ref<Resource>> &p_target_resource) {
 	List<PropertyInfo> pi;
 	p_object->get_property_list(&pi);
@@ -4259,6 +4306,7 @@ void EditorNode::replace_resources_in_object(Object *p_object, const Vector<Ref<
 				}
 			} break;
 			case Variant::DICTIONARY: {
+				std::cout << "\033[31meditor_node.cpp, R4262, replace_resources_in_object() CASE DICTIONARY ENTERED\033[0m" << std::endl;
 				Dictionary d = p_object->get(E.name);
 				bool dictionary_requires_updating = false;
 				for (const Variant &F : d.get_key_list()) {
@@ -4771,7 +4819,8 @@ int EditorNode::new_scene() {
 	return idx;
 }
 
-Error EditorNode::load_scene(const String &p_scene, bool p_ignore_broken_deps, bool p_set_inherited, bool p_force_open_imported, bool p_silent_change_tab) {
+// EDITED
+Error EditorNode::load_scene(const String &p_scene, bool p_ignore_broken_deps, bool p_set_inherited, bool p_force_open_imported, bool p_silent_change_tab) { 
 	if (!is_inside_tree()) {
 		defer_load_scene = p_scene;
 		return OK;
@@ -4824,7 +4873,7 @@ Error EditorNode::load_scene(const String &p_scene, bool p_ignore_broken_deps, b
 
 	Error err;
 	std::cout << "\033[31meditor_node.cpp, R4826, load_scene() CALL LOAD\033[0m" << std::endl;
-	Ref<PackedScene> sdata = ResourceLoader::load(lpath, "", ResourceFormatLoader::CACHE_MODE_REUSE, &err); // BEFORE CACHE_MODE_REPLACE
+	Ref<PackedScene> sdata = ResourceLoader::load(lpath, "", ResourceFormatLoader::CACHE_MODE_REUSE, &err); // EDIT: BEFORE CACHE_MODE_REPLACE
 	std::cout << "\033[31meditor_node.cpp, R4826, load_scene() LOAD EXITED\033[0m" << std::endl;
 	if (!p_ignore_broken_deps && !dependency_errors.is_empty()) {
 		current_menu_option = -1;
@@ -5132,7 +5181,10 @@ bool EditorNode::is_additional_node_in_scene(Node *p_edited_scene, Node *p_reimp
 	return true;
 }
 
-void EditorNode::get_scene_editor_data_for_node(Node *p_root, Node *p_node, HashMap<NodePath, SceneEditorDataEntry> &p_table) {
+// PRINTS
+void EditorNode::get_scene_editor_data_for_node(Node *p_root, Node *p_node, HashMap<NodePath, SceneEditorDataEntry> &p_table)
+{
+	std::cout << "\033[31meditor_node.cpp, R5183:\033[0m" << "get_scene_editor_data_for_node() ENTERED" << std::endl;
 	SceneEditorDataEntry new_entry;
 	new_entry.is_display_folded = p_node->is_displayed_folded();
 
@@ -5150,7 +5202,8 @@ void EditorNode::get_scene_editor_data_for_node(Node *p_root, Node *p_node, Hash
 void EditorNode::get_preload_scene_modification_table(
 		Node *p_edited_scene,
 		Node *p_reimported_root,
-		Node *p_node, InstanceModificationsEntry &p_instance_modifications) {
+		Node *p_node, InstanceModificationsEntry &p_instance_modifications)
+{
 	if (is_additional_node_in_scene(p_edited_scene, p_reimported_root, p_node)) {
 		// Only save additional nodes which have an owner since this was causing issues transient ownerless nodes
 		// which get recreated upon scene tree entry.
@@ -5255,7 +5308,8 @@ void EditorNode::get_preload_modifications_reference_to_nodes(
 		Node *p_node,
 		HashSet<Node *> &p_excluded_nodes,
 		List<Node *> &p_instance_list_with_children,
-		HashMap<NodePath, ModificationNodeEntry> &p_modification_table) {
+		HashMap<NodePath, ModificationNodeEntry> &p_modification_table)
+{
 	if (!p_excluded_nodes.find(p_node)) {
 		HashMap<StringName, Variant> modified_properties = get_modified_properties_reference_to_nodes(p_node, p_instance_list_with_children);
 
@@ -5272,7 +5326,10 @@ void EditorNode::get_preload_modifications_reference_to_nodes(
 	}
 }
 
+// PRINTS
 void EditorNode::get_children_nodes(Node *p_node, List<Node *> &p_nodes) {
+	std::cout << "\033[31meditor_node.cpp, R5328:\033[0m" << "get_children_nodes() ENTERED" << std::endl;
+
 	for (int i = 0; i < p_node->get_child_count(); i++) {
 		Node *child = p_node->get_child(i);
 		p_nodes.push_back(child);
@@ -5336,7 +5393,9 @@ bool EditorNode::is_resource_read_only(Ref<Resource> p_resource, bool p_foreign_
 	return false;
 }
 
+// PRINTS
 void EditorNode::request_instantiate_scene(const String &p_path) {
+	std::cout << "\033[31meditor_node.cpp, R5395:\033[0m" << "request_instantiate_scene() ENTERED" << std::endl;
 	SceneTreeDock::get_singleton()->instantiate(p_path);
 }
 
@@ -5363,7 +5422,9 @@ void EditorNode::_inherit_request(String p_file) {
 	_dialog_action(p_file);
 }
 
+// PRINTS
 void EditorNode::_instantiate_request(const Vector<String> &p_files) {
+	std::cout << "\033[31meditor_node.cpp, R5425:\033[0m" << "_instantiate_request() ENTERED" << std::endl;
 	request_instantiate_scenes(p_files);
 }
 
@@ -5442,7 +5503,9 @@ void EditorNode::_quick_opened(const String &p_file_path) {
 	load_scene_or_resource(p_file_path);
 }
 
+// PRINTS
 void EditorNode::_project_run_started() {
+	std::cout << "\033[31meditor_node.cpp, R5505:\033[0m" << "_project_run_started() ENTERED" << std::endl;
 	if (bool(EDITOR_GET("run/output/always_clear_output_on_play"))) {
 		log->clear();
 	}
@@ -5492,9 +5555,12 @@ void EditorNode::add_io_warning(const String &p_warning) {
 	}
 }
 
+// PRINTS
 bool EditorNode::find_recursive_resources(const Variant &p_variant, HashSet<Resource *> &r_resources_found) {
+	std::cout << "\033[31meditor_node.cpp, R5557:\033[0m" << "find_recursive_resources() ENTERED" << std::endl;
 	switch (p_variant.get_type()) {
 		case Variant::ARRAY: {
+			std::cout << "\033[31meditor_node.cpp, R5561:\033[0m" << "find_recursive_resources() ENTERED CASE ARRAY" << std::endl;
 			Array a = p_variant;
 			for (int i = 0; i < a.size(); i++) {
 				Variant v2 = a[i];
@@ -5507,6 +5573,7 @@ bool EditorNode::find_recursive_resources(const Variant &p_variant, HashSet<Reso
 			}
 		} break;
 		case Variant::DICTIONARY: {
+			std::cout << "\033[31meditor_node.cpp, R5574:\033[0m" << "find_recursive_resources() ENTERED CASE DICTIONARY" << std::endl;
 			Dictionary d = p_variant;
 			for (const KeyValue<Variant, Variant> &kv : d) {
 				const Variant &k = kv.key;
@@ -6345,7 +6412,9 @@ void EditorNode::_save_window_settings_to_config(Ref<ConfigFile> p_layout, const
 	}
 }
 
+// PRINTS
 void EditorNode::_load_open_scenes_from_config(Ref<ConfigFile> p_layout) {
+	std::cout << "\033[31meditor_node.cpp, R6414:\033[0m" << "_load_open_scenes_from_config() ENTERED" << std::endl;
 	if (Engine::get_singleton()->is_recovery_mode_hint()) {
 		return;
 	}
@@ -6463,6 +6532,7 @@ bool EditorNode::validate_custom_directory() {
 	return true;
 }
 
+// PRINTS
 void EditorNode::run_editor_script(const Ref<Script> &p_script) {
 	Error err = p_script->reload(true); // Always hard reload the script before running.
 	std::cout << "\033[31meditor_node.cpp, R6451, run_editor_script()\033[0m" << std::endl;
@@ -6502,6 +6572,7 @@ void EditorNode::run_editor_script(const Ref<Script> &p_script) {
 void EditorNode::_immediate_dialog_confirmed() {
 	immediate_dialog_confirmed = true;
 }
+
 bool EditorNode::immediate_confirmation_dialog(const String &p_text, const String &p_ok_text, const String &p_cancel_text, uint32_t p_wrap_width) {
 	ConfirmationDialog *cd = memnew(ConfirmationDialog);
 	cd->set_text(p_text);
@@ -6812,7 +6883,9 @@ void EditorNode::set_center_split_offset(int p_offset) {
 	center_split->set_split_offset(p_offset);
 }
 
+// PRINTS
 Dictionary EditorNode::drag_resource(const Ref<Resource> &p_res, Control *p_from) {
+	std::cout << "\033[31meditor_node.cpp, R6885:\033[0m" << "drag_resource() ENTERED" << std::endl;
 	Control *drag_control = memnew(Control);
 	TextureRect *drag_preview = memnew(TextureRect);
 	Label *label = memnew(Label);
@@ -7745,7 +7818,9 @@ void EditorNode::_set_renderer_name_save_and_restart(const String &p_rendering_m
 	restart_editor();
 }
 
+// PRINTS
 void EditorNode::_resource_saved(Ref<Resource> p_resource, const String &p_path) {
+	std::cout << "\033[31meditor_node.cpp, R7820:\033[0m" << "_resource_saved() ENTERED" << std::endl;
 	if (singleton->saving_resources_in_path.has(p_resource)) {
 		// This is going to be handled by save_resource_in_path when the time is right.
 		return;
@@ -7758,7 +7833,9 @@ void EditorNode::_resource_saved(Ref<Resource> p_resource, const String &p_path)
 	singleton->editor_folding.save_resource_folding(p_resource, p_path);
 }
 
+// PRINTS
 void EditorNode::_resource_loaded(Ref<Resource> p_resource, const String &p_path) {
+	std::cout << "\033[31meditor_node.cpp, R7835:\033[0m" << "_resource_loaded() ENTERED" << std::endl;
 	singleton->editor_folding.load_resource_folding(p_resource, p_path);
 }
 
@@ -7821,7 +7898,9 @@ static Node *_resource_get_edited_scene() {
 	return EditorNode::get_singleton()->get_edited_scene();
 }
 
+// PRINTS
 void EditorNode::_print_handler(void *p_this, const String &p_string, bool p_error, bool p_rich) {
+	std::cout << "\033[31meditor_node.cpp, R7900:\033[0m" << "_print_handler() ENTERED" << std::endl;
 	if (!Thread::is_main_thread()) {
 		callable_mp_static(&EditorNode::_print_handler_impl).call_deferred(p_string, p_error, p_rich);
 	} else {
@@ -7853,7 +7932,9 @@ static void _execute_thread(void *p_ud) {
 	eta->done.set();
 }
 
+// PRINTS
 int EditorNode::execute_and_show_output(const String &p_title, const String &p_path, const List<String> &p_arguments, bool p_close_on_ok, bool p_close_on_errors, String *r_output) {
+	std::cout << "\033[31meditor_node.cpp, R7934:\033[0m" << "execute_and_show_output() ENTERED" << std::endl;
 	if (execute_output_dialog) {
 		execute_output_dialog->set_title(p_title);
 		execute_output_dialog->get_ok_button()->set_disabled(true);

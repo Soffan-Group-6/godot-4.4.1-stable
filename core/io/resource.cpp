@@ -817,15 +817,19 @@ void ResourceCache::clear() {
 	resources.clear();
 }
 
+// POINT OF INTEREST
 bool ResourceCache::has(const String &p_path) {
 	Resource **res = nullptr;
-
+	std::cout << "resource.cpp, R822, has() " << p_path.utf8().get_data() << std::endl;
 	{
 		MutexLock mutex_lock(lock);
 
-		res = resources.getptr(p_path);
+		res = resources.getptr(p_path); // POINT OF INTEREST
+
+		std::cout << "resource.cpp, R828, has() " << std::endl;
 
 		if (res && (*res)->get_reference_count() == 0) {
+			std::cout << "resource.cpp, R831, has()  BEING DELETED" << std::endl;
 			// This resource is in the process of being deleted, ignore its existence.
 			(*res)->path_cache = String();
 			resources.erase(p_path);
@@ -834,12 +838,14 @@ bool ResourceCache::has(const String &p_path) {
 	}
 
 	if (!res) {
+		std::cout << "resource.cpp, R840, has() ENTER IF: !res" << std::endl;
 		return false;
 	}
 
 	return true;
 }
 
+// PRINTS
 Ref<Resource> ResourceCache::get_ref(const String &p_path) {
 	Ref<Resource> ref;
 	{

@@ -164,7 +164,9 @@ void ResourceFormatLoader::get_recognized_extensions(List<String> *p_extensions)
 
 Ref<Resource> ResourceFormatLoader::load(const String &p_path, const String &p_original_path, Error *r_error, bool p_use_sub_threads, float *r_progress, CacheMode p_cache_mode) {
 	Variant res;
+	std::cout << "ResourceFormatLoader:load()" << std::endl;
 	if (GDVIRTUAL_CALL(_load, p_path, p_original_path, p_use_sub_threads, p_cache_mode, res)) {
+		std::cout << "GDVIRTUAL_CALL" << std::endl;
 		if (res.get_type() == Variant::INT) { // Error code, abort.
 			if (r_error) {
 				*r_error = (Error)res.operator int64_t();
@@ -283,11 +285,16 @@ Ref<Resource> ResourceLoader::_load(const String &p_path, const String &p_origin
 	Ref<Resource> res;
 	for (int i = 0; i < loader_count; i++) {
 		if (!loader[i]->recognize_path(p_path, p_type_hint)) {
+			std::cout << "TESTING TESTING6" << std::endl;
+
 			continue;
 		}
 		found = true;
+		std::cout << "TESTING TESTING" << std::endl;
 		res = loader[i]->load(p_path, original_path, r_error, p_use_sub_threads, r_progress, p_cache_mode);
 		if (res.is_valid()) {
+			std::cout << "TESTING TESTING5" << std::endl;
+
 			break;
 		}
 	}
@@ -296,6 +303,8 @@ Ref<Resource> ResourceLoader::_load(const String &p_path, const String &p_origin
 	load_nesting--;
 
 	if (res.is_valid()) {
+		std::cout << "TESTING TESTING4" << std::endl;
+
 		return res;
 	} else {
 		print_verbose(vformat("Failed loading resource: %s", p_path));
@@ -304,6 +313,7 @@ Ref<Resource> ResourceLoader::_load(const String &p_path, const String &p_origin
 #ifdef TOOLS_ENABLED
 	if (Engine::get_singleton()->is_editor_hint()) {
 		if (ResourceFormatImporter::get_singleton()->get_importer_by_file(p_path).is_valid()) {
+			std::cout << "TESTING TESTING2" << std::endl;
 			// The format is known to the editor, but the file hasn't been imported
 			// (otherwise, ResourceFormatImporter would have been found as a suitable loader).
 			found = true;
@@ -319,6 +329,7 @@ Ref<Resource> ResourceLoader::_load(const String &p_path, const String &p_origin
 #ifdef TOOLS_ENABLED
 	Ref<FileAccess> file_check = FileAccess::create(FileAccess::ACCESS_RESOURCES);
 	if (!file_check->file_exists(p_path)) {
+		std::cout << "TESTING TESTING3" << std::endl;
 		if (r_error) {
 			*r_error = ERR_FILE_NOT_FOUND;
 		}
@@ -340,6 +351,7 @@ void ResourceLoader::_run_load_task(void *p_userdata) {
 	{
 		MutexLock thread_load_lock(thread_load_mutex);
 		if (cleaning_tasks) {
+			std::cout << "TEEST2" << std::endl;
 			load_task.status = THREAD_LOAD_FAILED;
 			return;
 		}
@@ -352,6 +364,7 @@ void ResourceLoader::_run_load_task(void *p_userdata) {
 	CallQueue *own_mq_override = nullptr;
 	if (load_nesting == 0) {
 		if (!Thread::is_main_thread()) {
+			std::cout << "TEEST2" << std::endl;
 			// Let the caller thread use its own, for added flexibility. Provide one otherwise.
 			if (MessageQueue::get_singleton() == MessageQueue::get_main_singleton()) {
 				own_mq_override = memnew(CallQueue);
@@ -512,6 +525,7 @@ void ResourceLoader::_load_threaded_request_setup_user_token(LoadToken *p_token,
 	print_lt("REQUEST: user load tokens: " + itos(user_load_tokens.size()));
 }
 
+// PRINTS
 Ref<Resource> ResourceLoader::load(const String &p_path, const String &p_type_hint, ResourceFormatLoader::CacheMode p_cache_mode, Error *r_error) {
 	std::cout << "\033[31mresource_loader.cpp, R514, load() LOAD CALLED - PATH: \033[0m" << p_path.utf8().get_data() << std::endl;
 	if (r_error) {
@@ -541,6 +555,7 @@ Ref<Resource> ResourceLoader::load(const String &p_path, const String &p_type_hi
 	return res;
 }
 
+// EDITED
 Ref<ResourceLoader::LoadToken> ResourceLoader::_load_start(const String &p_path, const String &p_type_hint, LoadThreadMode p_thread_mode, ResourceFormatLoader::CacheMode p_cache_mode, bool p_for_user) {
 	String local_path = _validate_local_path(p_path);
 	ERR_FAIL_COND_V(local_path.is_empty(), Ref<ResourceLoader::LoadToken>());
@@ -552,7 +567,6 @@ Ref<ResourceLoader::LoadToken> ResourceLoader::_load_start(const String &p_path,
 	ThreadLoadTask *load_task_ptr = nullptr;
 	{
 		MutexLock thread_load_lock(thread_load_mutex);
-		std::cout << "\033[31mtest1\033[0m" << std::endl;
 		if (p_for_user) {
 			std::cout << "\033[31mif1\033[0m" << std::endl;
 			LoadToken *existing_token = _load_threaded_request_reuse_user_token(p_path);
@@ -561,7 +575,6 @@ Ref<ResourceLoader::LoadToken> ResourceLoader::_load_start(const String &p_path,
 			}
 		}
 
-		std::cout << "\033[31mtest2\033[0m" << std::endl;
 		if (!ignoring_cache && thread_load_tasks.has(local_path)) {
 			std::cout << "\033[31mif2\033[0m" << p_path.utf8().get_data() << std::endl;
 			load_token = Ref<LoadToken>(thread_load_tasks[local_path].load_token);
@@ -581,7 +594,6 @@ Ref<ResourceLoader::LoadToken> ResourceLoader::_load_start(const String &p_path,
 				thread_load_tasks[local_path].load_token->clear();
 			}
 		}
-		std::cout << "\033[31mtest3\033[0m" << std::endl;
 
 		load_token.instantiate();
 		load_token->local_path = local_path;
@@ -590,7 +602,6 @@ Ref<ResourceLoader::LoadToken> ResourceLoader::_load_start(const String &p_path,
 			_load_threaded_request_setup_user_token(load_token.ptr(), p_path);
 		}
 
-		std::cout << "\033[31mtest4\033[0m" << std::endl;
 		//create load task
 		{
 			ThreadLoadTask load_task;
@@ -600,18 +611,21 @@ Ref<ResourceLoader::LoadToken> ResourceLoader::_load_start(const String &p_path,
 			load_task.type_hint = p_type_hint;
 			load_task.cache_mode = p_cache_mode;
 			load_task.use_sub_threads = p_thread_mode == LOAD_THREAD_DISTRIBUTE;
-			std::cout << "\033[31mtest5: p_cache_mode: \033[0m" << p_cache_mode << " CACHE_MODE_REUSE: " << ResourceFormatLoader::CACHE_MODE_REUSE << std::endl;
+			std::cout << "\033[31mp_cache_mode: \033[0m" << p_cache_mode << " CACHE_MODE_REUSE: " << ResourceFormatLoader::CACHE_MODE_REUSE << std::endl;
 			if (p_cache_mode == ResourceFormatLoader::CACHE_MODE_REUSE) {
 				std::cout << "\033[31mresource_loader.cpp, R592, _load_start() get_ref() CALLED\033[0m" << std::endl;
 				Ref<Resource> existing = ResourceCache::get_ref(local_path);
-				if (existing.is_valid()) {
+				
+				if (existing.is_valid() && p_path != "res://resource_a.tres" && p_path != "res://resource_b.tres") { // EDITED: before: existing.is_valid()
 					std::cout << "\033[31mresource_loader.cpp, R595, _load_start() ENTER IF: existing.is_valid()\033[0m" << std::endl;
 					//referencing is fine
 					load_task.resource = existing;
 					load_task.status = THREAD_LOAD_LOADED;
 					load_task.progress = 1.0;
+					std::cout << "XXXXXXXXXXXXXXXXXXXXXX" << std::endl;
 					DEV_ASSERT(!thread_load_tasks.has(local_path));
 					thread_load_tasks[local_path] = load_task;
+					std::cout << "XXXXXXXXXXXXXXXXXXXXXX" << std::endl;
 					return load_token;
 				}
 			}
@@ -803,8 +817,8 @@ Ref<Resource> ResourceLoader::load_threaded_get(const String &p_path, Error *r_e
 }
 
 Ref<Resource> ResourceLoader::_load_complete(LoadToken &p_load_token, Error *r_error) {
-	std::cout << "\033[31mresource_loader.cpp, R796, _load_complete() ENTERED\033[0m" << std::endl;
 	MutexLock thread_load_lock(thread_load_mutex);
+	std::cout << "\033[31mresource_loader.cpp, R796, _load_complete() ENTERED \033[0m" << "thread_load_lock = " << &thread_load_lock << std::endl;
 	return _load_complete_inner(p_load_token, r_error, thread_load_lock);
 }
 
@@ -1264,6 +1278,7 @@ String ResourceLoader::_path_remap(const String &p_path, bool *r_translation_rem
 		// An extra remap may still be necessary afterwards due to the text -> binary converter on export.
 
 		String locale = TranslationServer::get_singleton()->get_locale();
+		std::cout << "_path_remap: " << locale.utf8().get_data() << std::endl;
 		ERR_FAIL_COND_V_MSG(locale.length() < 2, p_path, vformat("Could not remap path '%s' for translation as configured locale '%s' is invalid.", p_path, locale));
 
 		Vector<String> &res_remaps = *translation_remaps.getptr(new_path);
@@ -1301,9 +1316,11 @@ String ResourceLoader::_path_remap(const String &p_path, bool *r_translation_rem
 	// Usually, there's no remap file and FileAccess::exists() is faster than FileAccess::open().
 	new_path = ResourceUID::ensure_path(new_path);
 	if (FileAccess::exists(new_path + ".remap")) {
+		std::cout << "BBBBBBBBB" << std::endl;
 		Error err;
 		Ref<FileAccess> f = FileAccess::open(new_path + ".remap", FileAccess::READ, &err);
 		if (f.is_valid()) {
+			std::cout << "AAAAAAAAAAAAAA" << std::endl;
 			VariantParser::StreamFile stream;
 			stream.f = f;
 

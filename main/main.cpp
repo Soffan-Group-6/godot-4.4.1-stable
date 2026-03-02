@@ -727,6 +727,7 @@ void Main::print_help(const char *p_binary) {
 Error Main::test_setup() {
 	ERR_FAIL_V(ERR_UNAVAILABLE);
 }
+
 void Main::test_cleanup() {}
 #else
 // The order is the same as in `Main::setup()`, only core and some editor types
