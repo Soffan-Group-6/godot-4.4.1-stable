@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://d1h5eal16oy4s"]
+
+[ext_resource type="Script" uid="uid://ljug0paee2pc" path="res://addons/plugin/plugin_main.gd" id="1_w55w7"]
+
+[node name="PluginMain" type="VBoxContainer"]
+offset_right = 171.0
+offset_bottom = 66.0
+script = ExtResource("1_w55w7")
+
+[node name="ButtonA" type="Button" parent="."]
+layout_mode = 2
+text = "Add random key to A"
+
+[node name="ButtonB" type="Button" parent="."]
+layout_mode = 2
+text = "Add random key to B"
