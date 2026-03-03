@@ -1,0 +1,15 @@
+GDTEST_OK
+a.empty_dict size: 1
+b.empty_dict size: 0
+a.empty_array size: 1
+b.empty_array size: 0
+a.typed_dict size: 1
+b.typed_dict size: 0
+a.typed_array size: 1
+b.typed_array size: 0
+c.empty_dict size: 1
+c.empty_array size: 0
+empty_dict read_only: false
+typed_dict read_only: false
+empty_array read_only: false
+typed_array read_only: false

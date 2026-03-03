@@ -1,0 +1,16 @@
+GDTEST_OK
+res_a.data: { "player": "Alice" }
+res_b.data: {  }
+res_c.data: {  }
+res_a.items: ["sword"]
+res_b.items: []
+res_c.items: []
+res_a.typed_data: { "score": 100 }
+res_b.typed_data: {  }
+res_c.typed_data: {  }
+res_a.typed_items: ["shield"]
+res_b.typed_items: []
+res_c.typed_items: []
+res_a.data size: 1
+res_b.data size: 1
+res_c.data size: 0

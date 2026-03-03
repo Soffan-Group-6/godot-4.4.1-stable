@@ -1,0 +1,13 @@
+GDTEST_OK
+a.dict_with_data: { "a": 1, "b": 2 }
+b.dict_with_data: { "a": 1, "b": 2 }
+a.array_with_data: [10, 20, 30]
+b.array_with_data: [10, 20, 30]
+a.dict_with_data size: 3
+b.dict_with_data size: 2
+a.array_with_data size: 4
+b.array_with_data size: 3
+a.dict_with_data size after clear: 0
+b.dict_with_data size after clear: 2
+a.array_with_data size after clear: 0
+b.array_with_data size after clear: 3
