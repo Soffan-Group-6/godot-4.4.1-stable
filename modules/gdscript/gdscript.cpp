@@ -390,6 +390,14 @@ bool GDScript::get_property_default_value(const StringName &p_property, Variant 
 	HashMap<StringName, Variant>::ConstIterator E = member_default_values_cache.find(p_property);
 	if (E) {
 		r_value = E->value;
+		// Duplicate container types so callers don't share the same cached instance.
+		// Without this, all resources using this script would share the same
+		// Dictionary/Array object in memory (GH-107588).
+		if (r_value.get_type() == Variant::DICTIONARY) {
+			r_value = Dictionary(r_value).duplicate();
+		} else if (r_value.get_type() == Variant::ARRAY) {
+			r_value = Array(r_value).duplicate();
+		}
 		return true;
 	}
 
@@ -459,7 +467,15 @@ void GDScript::set_source_code(const String &p_code) {
 #ifdef TOOLS_ENABLED
 void GDScript::_update_exports_values(HashMap<StringName, Variant> &values, List<PropertyInfo> &propnames) {
 	for (const KeyValue<StringName, Variant> &E : member_default_values_cache) {
-		values[E.key] = E.value;
+		// Duplicate container types so each placeholder gets its own instance
+		// instead of sharing the same cached object (GH-107588).
+		if (E.value.get_type() == Variant::DICTIONARY) {
+			values[E.key] = Dictionary(E.value).duplicate();
+		} else if (E.value.get_type() == Variant::ARRAY) {
+			values[E.key] = Array(E.value).duplicate();
+		} else {
+			values[E.key] = E.value;
+		}
 	}
 
 	for (const PropertyInfo &E : members_cache) {

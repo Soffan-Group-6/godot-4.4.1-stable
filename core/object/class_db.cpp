@@ -2304,6 +2304,15 @@ Variant ClassDB::class_get_default_property_value(const StringName &p_class, con
 
 	Variant var = default_values[p_class][p_property];
 
+	// Duplicate container types so callers don't share the same cached instance.
+	// Without this, all resources of the same class would share the same
+	// Dictionary/Array object in memory (GH-107588).
+	if (var.get_type() == Variant::DICTIONARY) {
+		var = Dictionary(var).duplicate();
+	} else if (var.get_type() == Variant::ARRAY) {
+		var = Array(var).duplicate();
+	}
+
 #ifdef DEBUG_ENABLED
 	// Some properties may have an instantiated Object as default value,
 	// (like Path2D's `curve` used to have), but that's not a good practice.
