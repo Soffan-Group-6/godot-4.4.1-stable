@@ -253,7 +253,14 @@ static bool _can_use_validate_call(const MethodBind *p_method, const Vector<GDSc
 
 GDScriptCodeGenerator::Address GDScriptCompiler::_parse_expression(CodeGen &codegen, Error &r_error, const GDScriptParser::ExpressionNode *p_expression, bool p_root, bool p_initializer) {
 	if (p_expression->is_constant && !(p_expression->get_datatype().is_meta_type && p_expression->get_datatype().kind == GDScriptParser::DataType::CLASS)) {
-		return codegen.add_constant(p_expression->reduced_value);
+		// Don't treat Dictionary/Array literals as constants when used as member
+		// field initializers. Constants are shared across all instances via the
+		// function's constant pool, so every instance would reference the same
+		// object in memory. Instead, fall through to emit construction code that
+		// creates a fresh container for each instance (GH-107588).
+		if (!p_initializer || (p_expression->reduced_value.get_type() != Variant::DICTIONARY && p_expression->reduced_value.get_type() != Variant::ARRAY)) {
+			return codegen.add_constant(p_expression->reduced_value);
+		}
 	}
 
 	GDScriptCodeGenerator *gen = codegen.generator;
@@ -2912,7 +2919,15 @@ Error GDScriptCompiler::_prepare_compilation(GDScript *p_script, const GDScriptP
 
 #ifdef TOOLS_ENABLED
 				if (variable->initializer != nullptr && variable->initializer->is_constant) {
-					p_script->member_default_values[name] = variable->initializer->reduced_value;
+					Variant default_val = variable->initializer->reduced_value;
+					// Duplicate container types so the stored default is an independent
+					// mutable copy, not the shared read-only reduced value (GH-107588).
+					if (default_val.get_type() == Variant::DICTIONARY) {
+						default_val = Dictionary(default_val).duplicate();
+					} else if (default_val.get_type() == Variant::ARRAY) {
+						default_val = Array(default_val).duplicate();
+					}
+					p_script->member_default_values[name] = default_val;
 					GDScriptCompiler::convert_to_initializer_type(p_script->member_default_values[name], variable);
 				} else {
 					p_script->member_default_values.erase(name);

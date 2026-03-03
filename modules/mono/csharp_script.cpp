@@ -2060,7 +2060,15 @@ void CSharpScript::_placeholder_erased(PlaceHolderScriptInstance *p_placeholder)
 #ifdef TOOLS_ENABLED
 void CSharpScript::_update_exports_values(HashMap<StringName, Variant> &values, List<PropertyInfo> &propnames) {
 	for (const KeyValue<StringName, Variant> &E : exported_members_defval_cache) {
-		values[E.key] = E.value;
+		// Duplicate container types so each placeholder gets its own instance
+		// instead of sharing the same cached object (GH-107588).
+		if (E.value.get_type() == Variant::DICTIONARY) {
+			values[E.key] = Dictionary(E.value).duplicate();
+		} else if (E.value.get_type() == Variant::ARRAY) {
+			values[E.key] = Array(E.value).duplicate();
+		} else {
+			values[E.key] = E.value;
+		}
 	}
 
 	for (const PropertyInfo &prop_info : exported_members_cache) {
