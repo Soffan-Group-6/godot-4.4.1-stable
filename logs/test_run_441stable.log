@@ -1,0 +1,18 @@
+ERROR: Unrecognized binary resource file: 'res://gltf_placed_in_dot_godot_imported.scn'.
+   at: ResourceLoaderBinary::open (core\io\resource_format_binary.cpp:1008)
+ERROR: EditorNode doesn't exist.
+   at: EditorInterface::make_scene_preview (editor\editor_interface.cpp:236)
+ERROR: Unrecognized binary resource file: 'res://gltf_pointing_to_texture_outside_of_res_folder.scn'.
+   at: ResourceLoaderBinary::open (core\io\resource_format_binary.cpp:1008)
+ERROR: EditorNode doesn't exist.
+   at: EditorInterface::make_scene_preview (editor\editor_interface.cpp:236)
+ERROR: Unrecognized binary resource file: 'res://embedded_texture.scn'.
+   at: ResourceLoaderBinary::open (core\io\resource_format_binary.cpp:1008)
+ERROR: EditorNode doesn't exist.
+   at: EditorInterface::make_scene_preview (editor\editor_interface.cpp:236)
+[doctest] doctest version is "2.4.11"
+[doctest] run with "--help" for options
+===============================================================================
+[doctest] test cases:    1171 |    1171 passed | 0 failed | 1 skipped
+[doctest] assertions: 2424688 | 2424688 passed | 0 failed |
+[doctest] Status: SUCCESS!

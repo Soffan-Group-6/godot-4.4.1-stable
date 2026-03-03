@@ -1,0 +1,24 @@
+[doctest] doctest version is "2.4.11"
+[doctest] run with "--help" for options
+ERROR: Unrecognized binary resource file: 'res://gltf_placed_in_dot_godot_imported.scn'.
+   at: open (core/io/resource_format_binary.cpp:1008)
+ERROR: EditorNode doesn't exist.
+   at: make_scene_preview (editor/editor_interface.cpp:236)
+WARNING: 'res://gltf_placed_in_dot_godot_imported.scn': In external resource #0, invalid UID: 'uid://cblsv8mtymu1r' - using text path instead: 'res://gltf_placed_in_dot_godot_imported_material_albedo000.png'.
+     at: open (core/io/resource_format_binary.cpp:1094)
+ERROR: Unrecognized binary resource file: 'res://gltf_pointing_to_texture_outside_of_res_folder.scn'.
+   at: open (core/io/resource_format_binary.cpp:1008)
+ERROR: EditorNode doesn't exist.
+   at: make_scene_preview (editor/editor_interface.cpp:236)
+WARNING: 'res://gltf_pointing_to_texture_outside_of_res_folder.scn': In external resource #0, invalid UID: 'uid://dmeolb1bcxclt' - using text path instead: 'res://gltf_pointing_to_texture_outside_of_res_folder_material_albedo000.png'.
+     at: open (core/io/resource_format_binary.cpp:1094)
+ERROR: Unrecognized binary resource file: 'res://embedded_texture.scn'.
+   at: open (core/io/resource_format_binary.cpp:1008)
+ERROR: EditorNode doesn't exist.
+   at: make_scene_preview (editor/editor_interface.cpp:236)
+WARNING: 'res://embedded_texture.scn': In external resource #0, invalid UID: 'uid://nn3w7wtagsgl' - using text path instead: 'res://embedded_texture_material_albedo000.png'.
+     at: open (core/io/resource_format_binary.cpp:1094)
+===============================================================================
+[doctest] test cases:    1166 |    1166 passed | 0 failed | 1 skipped
+[doctest] assertions: 2424371 | 2424371 passed | 0 failed |
+[doctest] Status: SUCCESS!

@@ -1,0 +1,10 @@
+WARNING: OptimizedTranslation does not store the message texts to be translated.
+   at: OptimizedTranslation::get_message_list (core\string\optimized_translation.cpp:323)
+WARNING: OptimizedTranslation does not store the message texts to be translated.
+   at: OptimizedTranslation::get_message_count (core\string\optimized_translation.cpp:327)
+[doctest] doctest version is "2.4.12"
+[doctest] run with "--help" for options
+===============================================================================
+[doctest] test cases:   1271 |   1271 passed | 0 failed | 3 skipped
+[doctest] assertions: 417506 | 417506 passed | 0 failed |
+[doctest] Status: SUCCESS!
